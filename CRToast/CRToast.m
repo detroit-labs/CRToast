@@ -151,7 +151,7 @@ typedef NS_ENUM(NSInteger, CRToastState) {
 @property (nonatomic, readonly) NSInteger subtitleTextMaxNumberOfLines;
 @property (nonatomic, readonly) UIStatusBarStyle statusBarStyle;
 @property (nonatomic, readonly) UIColor *backgroundColor;
-@property (nonatomic, readonly) UIImage *image;
+@property (nonatomic, readonly) UIImageView *imageView;
 
 @property (nonatomic, readonly) CGVector inGravityDirection;
 @property (nonatomic, readonly) CGVector outGravityDirection;
@@ -212,7 +212,7 @@ NSString *const kCRToastSubtitleTextMaxNumberOfLinesKey     = @"kCRToastSubtitle
 NSString *const kCRToastStatusBarStyleKey                   = @"kCRToastStatusBarStyleKey";
 
 NSString *const kCRToastBackgroundColorKey                  = @"kCRToastBackgroundColorKey";
-NSString *const kCRToastImageKey                            = @"kCRToastImageKey";
+NSString *const kCRToastImageViewKey                        = @"kCRToastImageViewKey";
 
 NSString *const kCRToastInteractionRespondersKey            = @"kCRToastInteractionRespondersKey";
 
@@ -257,7 +257,7 @@ static NSInteger                    kCRSubtitleTextMaxNumberOfLinesDefault  = 0;
 static UIStatusBarStyle             kCRStatusBarStyleDefault                = UIStatusBarStyleDefault;
 
 static UIColor  *                   kCRBackgroundColorDefault               = nil;
-static UIImage  *                   kCRImageDefault                         = nil;
+static UIImageView  *               kCRImageViewDefault                     = nil;
 
 static NSArray  *                   kCRInteractionResponders                = nil;
 
@@ -483,7 +483,7 @@ NSArray * CRToastGenericRecognizersMake(id target, CRToastInteractionResponder *
                                 kCRToastSubtitleTextMaxNumberOfLinesKey     : NSStringFromClass([@(kCRSubtitleTextMaxNumberOfLinesDefault) class]),
                                 kCRToastStatusBarStyleKey                   : NSStringFromClass([@(kCRStatusBarStyleDefault) class]),
                                 kCRToastBackgroundColorKey                  : NSStringFromClass([UIColor class]),
-                                kCRToastImageKey                            : NSStringFromClass([UIImage class]),
+                                kCRToastImageViewKey                        : NSStringFromClass([UIImageView class]),
                                 kCRToastInteractionRespondersKey            : NSStringFromClass([NSArray class]),
                                 kCRToastAutorotateKey                       : NSStringFromClass([@(kCRAutoRotateDefault) class])};
     }
@@ -542,7 +542,7 @@ NSArray * CRToastGenericRecognizersMake(id target, CRToastInteractionResponder *
     if (defaultOptions[kCRToastSubtitleTextMaxNumberOfLinesKey])    kCRSubtitleTextMaxNumberOfLinesDefault  = [defaultOptions[kCRToastSubtitleTextMaxNumberOfLinesKey] integerValue];
     
     if (defaultOptions[kCRToastBackgroundColorKey])                 kCRBackgroundColorDefault               = defaultOptions[kCRToastBackgroundColorKey];
-    if (defaultOptions[kCRToastImageKey])                           kCRImageDefault                         = defaultOptions[kCRToastImageKey];
+    if (defaultOptions[kCRToastImageViewKey])                       kCRImageViewDefault                     = defaultOptions[kCRToastImageViewKey];
     
     if (defaultOptions[kCRToastInteractionRespondersKey])           kCRInteractionResponders               = defaultOptions[kCRToastInteractionRespondersKey];
     if (defaultOptions[kCRToastAutorotateKey])                      kCRAutoRotateDefault                   = [defaultOptions[kCRToastAutorotateKey] boolValue];
@@ -777,8 +777,8 @@ NSArray * CRToastGenericRecognizersMake(id target, CRToastInteractionResponder *
     return _options[kCRToastBackgroundColorKey] ?: kCRBackgroundColorDefault;
 }
 
-- (UIImage*)image {
-    return _options[kCRToastImageKey] ?: kCRImageDefault;
+- (UIImageView*)imageView {
+    return _options[kCRToastImageViewKey] ?: kCRImageViewDefault;
 }
 
 - (NSInteger)maxNumberOfLines {
@@ -1059,20 +1059,27 @@ static CGFloat const CRStatusBarViewUnderStatusBarYOffsetAdjustment = -5;
         labelX = alignment == CRToastImageLeft ? imageSize.width : kCRStatusBarViewNoImageContentInset;
         labelWidth = CGRectGetWidth(contentFrame) - labelX - kCRStatusBarViewNoImageContentInset;
     }
-
-    self.imageView.frame = CGRectMake(0, 0, imageSize.width == 0 ? 0 : CGRectGetHeight(contentFrame), imageSize.height == 0 ? 0 : CGRectGetHeight(contentFrame));
-
+    
     CGFloat imageX = 0;
 
     if (alignment == CRToastImageCenter) {
         imageX = CGRectGetWidth(contentFrame)/2 - CGRectGetWidth(self.imageView.frame)/2;
     } else if (alignment == CRToastImageRight) {
-        imageX = CGRectGetWidth(contentFrame) - CGRectGetWidth(self.imageView.frame);
+        imageX = CGRectGetWidth(contentFrame) - CGRectGetWidth(self.imageView.frame) - kCRStatusBarViewNoImageContentInset;
     }
     
     CGRect newImageFrame = self.imageView.frame;
     newImageFrame.origin.x = imageX;
+    newImageFrame.origin.y = CGRectGetHeight(contentFrame)/2 - CGRectGetHeight(self.imageView.frame)/2;
     self.imageView.frame = newImageFrame;
+
+    [self addSubview:self.imageView];
+    
+    [self.imageView sizeToFit];
+    if (self.imageView.animationImages.count > 0)
+    {
+        [self.imageView startAnimating];
+    }
 
     if (self.toast.subtitleText == nil) {
         self.label.frame = CGRectMake(labelX, statusBarYOffset, labelWidth, CGRectGetHeight(contentFrame));
@@ -1122,7 +1129,7 @@ static CGFloat const CRStatusBarViewUnderStatusBarYOffsetAdjustment = -5;
         _subtitleLabel.textAlignment = toast.subtitleTextAlignment;
         _subtitleLabel.numberOfLines = toast.subtitleTextMaxNumberOfLines;
     }
-    _imageView.image = toast.image;
+    _imageView = toast.imageView;
     self.backgroundColor = toast.backgroundColor;
 }
 

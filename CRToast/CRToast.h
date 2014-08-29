@@ -318,10 +318,10 @@ extern NSString *const kCRToastStatusBarStyleKey;
 extern NSString *const kCRToastBackgroundColorKey;
 
 /**
- The image to be shown in the notification. Expects type `UIImage`.
+ The image to be shown in the notification. Expects type `UIImageView`.
  */
 
-extern NSString *const kCRToastImageKey;
+extern NSString *const kCRToastImageViewKey;
 
 /**
  An Array of Interaction Responders for the Notification. Expects type `NSArray` full of `CRToastInteractionResponders`

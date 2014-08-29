@@ -178,7 +178,7 @@ CRToastAnimationType CRToastAnimationTypeFromSegmentedControl(UISegmentedControl
                                       kCRToastImageAlignmentKey                 : @(CRToastImageRight)
                                       } mutableCopy];
     if (self.showImageSwitch.on) {
-        options[kCRToastImageKey] = [UIImage imageNamed:@"alert_icon.png"];
+        options[kCRToastImageViewKey] = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"alert_icon.png"]];
     }
     
     if (![self.txtSubtitleMessage.text isEqualToString:@""]) {

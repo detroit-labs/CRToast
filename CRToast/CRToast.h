@@ -106,7 +106,7 @@ typedef NS_ENUM(NSInteger, CRToastAnimationType) {
 };
 
 /**
- 'CRToastImageAllignment' defines how the image should be alligned on the notification
+ 'CRToastImageAlignment' defines how the image should be aligned on the notification
 */
 
 typedef NS_ENUM(NSInteger, CRToastImageAlignment) {

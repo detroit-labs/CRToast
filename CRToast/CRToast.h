@@ -105,6 +105,16 @@ typedef NS_ENUM(NSInteger, CRToastAnimationType) {
     CRToastAnimationTypeGravity
 };
 
+/**
+ 'CRToastImageAlignment' defines how the image should be aligned on the notification
+*/
+
+typedef NS_ENUM(NSInteger, CRToastImageAlignment) {
+    CRToastImageLeft,
+    CRToastImageCenter,
+    CRToastImageRight
+};
+
 ///--------------------
 /// @name Option Keys
 ///--------------------
@@ -139,6 +149,12 @@ extern NSString *const kCRToastNotificationPresentationTypeKey;
  */
 
 extern NSString *const kCRToastUnderStatusBarKey;
+
+/**
+ Indicates whether the notification should slide out from under the navigation bar. Excepts type `BOOL`.
+*/
+
+extern NSString *const kCRToastBelowNavBarKey;
 
 /**
  The animation in type for the notification. Expects type `CRToastAnimationType`.
@@ -216,6 +232,12 @@ extern NSString *const kCRToastTextKey;
  */
 
 extern NSString *const kCRToastFontKey;
+
+/**
+ The font attributes to be used for the `kCRToastTextKey` value. Expects type `NSDictionary`.
+*/
+
+extern NSString *const kCRToastFontAttributesKey;
 
 /**
  The text color to be used for the `kCRToastTextKey` value . Expects type `UIColor`.
@@ -302,10 +324,10 @@ extern NSString *const kCRToastStatusBarStyleKey;
 extern NSString *const kCRToastBackgroundColorKey;
 
 /**
- The image to be shown on the left side of the notification. Expects type `UIImage`.
+ The image to be shown in the notification. Expects type `UIImageView`.
  */
 
-extern NSString *const kCRToastImageKey;
+extern NSString *const kCRToastImageViewKey;
 
 /**
  An Array of Interaction Responders for the Notification. Expects type `NSArray` full of `CRToastInteractionResponders`
@@ -319,6 +341,11 @@ extern NSString *const kCRToastInteractionRespondersKey;
 
 extern NSString *const kCRToastAutorotateKey;
 
+/**
+ The image alignment to be used for the `kCRToastImageKey` value . Expects type `CRToastImageAlignment`.
+ */
+
+extern NSString *const kCRToastImageAlignmentKey;
 
 /**
  A toast manager providing Class level API's for the presentation of notifications with a variery of options

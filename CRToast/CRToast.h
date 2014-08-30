@@ -234,6 +234,12 @@ extern NSString *const kCRToastTextKey;
 extern NSString *const kCRToastFontKey;
 
 /**
+ The font attributes to be used for the `kCRToastTextKey` value. Expects type `NSDictionary`.
+*/
+
+extern NSString *const kCRToastFontAttributesKey;
+
+/**
  The text color to be used for the `kCRToastTextKey` value . Expects type `UIColor`.
  */
 

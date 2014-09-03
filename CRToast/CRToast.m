@@ -119,6 +119,7 @@ typedef NS_ENUM(NSInteger, CRToastState) {
 @property (nonatomic, assign) CGFloat preferredHeight;
 @property (nonatomic, readonly) CRToastPresentationType presentationType;
 @property (nonatomic, readonly) BOOL displayUnderStatusBar;
+@property (nonatomic, readonly) BOOL displayBelowNavBar;
 
 @property (nonatomic, readonly) CRToastAnimationType inAnimationType;
 @property (nonatomic, readonly) CRToastAnimationType outAnimationType;
@@ -127,6 +128,7 @@ typedef NS_ENUM(NSInteger, CRToastState) {
 @property (nonatomic, readonly) NSTimeInterval animateInTimeInterval;
 @property (nonatomic, readonly) NSTimeInterval timeInterval;
 @property (nonatomic, readonly) NSTimeInterval animateOutTimeInterval;
+@property (nonatomic, readonly) CRToastImageAlignment imageAlignment;
 
 @property (nonatomic, readonly) CGFloat animationSpringDamping;
 @property (nonatomic, readonly) CGFloat animationSpringInitialVelocity;
@@ -134,6 +136,7 @@ typedef NS_ENUM(NSInteger, CRToastState) {
 
 @property (nonatomic, readonly) NSString *text;
 @property (nonatomic, readonly) UIFont *font;
+@property (nonatomic, readonly) NSDictionary *fontAttributes;
 @property (nonatomic, readonly) UIColor *textColor;
 @property (nonatomic, readonly) NSTextAlignment textAlignment;
 @property (nonatomic, readonly) UIColor *textShadowColor;
@@ -149,7 +152,7 @@ typedef NS_ENUM(NSInteger, CRToastState) {
 @property (nonatomic, readonly) NSInteger subtitleTextMaxNumberOfLines;
 @property (nonatomic, readonly) UIStatusBarStyle statusBarStyle;
 @property (nonatomic, readonly) UIColor *backgroundColor;
-@property (nonatomic, readonly) UIImage *image;
+@property (nonatomic, readonly) UIImageView *imageView;
 
 @property (nonatomic, readonly) CGVector inGravityDirection;
 @property (nonatomic, readonly) CGVector outGravityDirection;
@@ -175,11 +178,14 @@ NSString *const kCRToastNotificationPreferredHeightKey         = @"kCRToastNotif
 NSString *const kCRToastNotificationPresentationTypeKey     = @"kCRToastNotificationPresentationTypeKey";
 
 NSString *const kCRToastUnderStatusBarKey                   = @"kCRToastUnderStatusBarKey";
+NSString *const kCRToastBelowNavBarKey                      = @"kCRToastBelowNavBarKey";
 
 NSString *const kCRToastAnimationInTypeKey                  = @"kCRToastAnimationInTypeKey";
 NSString *const kCRToastAnimationOutTypeKey                 = @"kCRToastAnimationOutTypeKey";
-NSString *const kCRToastAnimationInDirectionKey                 = @"kCRToastAnimationInDirectionKey";
-NSString *const kCRToastAnimationOutDirectionKey                = @"kCRToastAnimationOutDirectionKey";
+NSString *const kCRToastAnimationInDirectionKey             = @"kCRToastAnimationInDirectionKey";
+NSString *const kCRToastAnimationOutDirectionKey            = @"kCRToastAnimationOutDirectionKey";
+
+NSString *const kCRToastImageAlignmentKey                  = @"kCRToastImageAlignmentKey";
 
 NSString *const kCRToastAnimationInTimeIntervalKey          = @"kCRToastAnimateInTimeInterval";
 NSString *const kCRToastTimeIntervalKey                     = @"kCRToastTimeIntervalKey";
@@ -191,6 +197,7 @@ NSString *const kCRToastAnimationGravityMagnitudeKey        = @"kCRToastAnimatio
 
 NSString *const kCRToastTextKey                             = @"kCRToastTextKey";
 NSString *const kCRToastFontKey                             = @"kCRToastFontKey";
+NSString *const kCRToastFontAttributesKey                   = @"kCRToastFontAttributesKey";
 NSString *const kCRToastTextColorKey                        = @"kCRToastTextColorKey";
 NSString *const kCRToastTextAlignmentKey                    = @"kCRToastTextAlignmentKey";
 NSString *const kCRToastTextShadowColorKey                  = @"kCRToastTextShadowColorKey";
@@ -207,7 +214,7 @@ NSString *const kCRToastSubtitleTextMaxNumberOfLinesKey     = @"kCRToastSubtitle
 NSString *const kCRToastStatusBarStyleKey                   = @"kCRToastStatusBarStyleKey";
 
 NSString *const kCRToastBackgroundColorKey                  = @"kCRToastBackgroundColorKey";
-NSString *const kCRToastImageKey                            = @"kCRToastImageKey";
+NSString *const kCRToastImageViewKey                        = @"kCRToastImageViewKey";
 
 NSString *const kCRToastInteractionRespondersKey            = @"kCRToastInteractionRespondersKey";
 
@@ -219,6 +226,7 @@ static CRToastType                  kCRNotificationTypeDefault              = CR
 static CGFloat                      kCRNotificationPreferredHeightDefault   = 0;
 static CRToastPresentationType      kCRNotificationPresentationTypeDefault  = CRToastPresentationTypePush;
 static BOOL                         kCRDisplayUnderStatusBarDefault         = NO;
+static BOOL                         kCRDisplayBelowNavBarDefault            = NO;
 
 static CRToastAnimationType         kCRAnimationTypeDefaultIn               = CRToastAnimationTypeLinear;
 static CRToastAnimationType         kCRAnimationTypeDefaultOut              = CRToastAnimationTypeLinear;
@@ -228,12 +236,14 @@ static NSTimeInterval               kCRAnimateInTimeIntervalDefault         = 0.
 static NSTimeInterval               kCRTimeIntervalDefault                  = 2.0f;
 static NSTimeInterval               kCRAnimateOutTimeIntervalDefault        = 0.4;
 
+static CRToastImageAlignment        kCRToastImageAlignmentDefault           = CRToastImageRight;
 static CGFloat                      kCRSpringDampingDefault                 = 0.6;
 static CGFloat                  	kCRSpringInitialVelocityDefault         = 1.0;
 static CGFloat                      kCRGravityMagnitudeDefault              = 1.0;
 
 static NSString *                   kCRTextDefault                          = @"";
 static UIFont   *                   kCRFontDefault                          = nil;
+static NSDictionary *               kCRFontAttributesDefault                = nil;
 static UIColor  *               	kCRTextColorDefault                     = nil;
 static NSTextAlignment          	kCRTextAlignmentDefault                 = NSTextAlignmentCenter;
 static UIColor  *               	kCRTextShadowColorDefault               = nil;
@@ -250,7 +260,7 @@ static NSInteger                    kCRSubtitleTextMaxNumberOfLinesDefault  = 0;
 static UIStatusBarStyle             kCRStatusBarStyleDefault                = UIStatusBarStyleDefault;
 
 static UIColor  *                   kCRBackgroundColorDefault               = nil;
-static UIImage  *                   kCRImageDefault                         = nil;
+static UIImageView  *               kCRImageViewDefault                     = nil;
 
 static NSArray  *                   kCRInteractionResponders                = nil;
 
@@ -308,6 +318,7 @@ static CGFloat CRGetNotificationViewHeightForOrientation(CRToastType type, CGFlo
         case CRToastTypeCustom:
             return preferredNotificationHeight;
     }
+    return preferredNotificationHeight;
 }
 
 static CGFloat CRGetNotificationViewHeight(CRToastType type, CGFloat preferredNotificationHeight) {
@@ -435,6 +446,7 @@ NSArray * CRToastGenericRecognizersMake(id target, CRToastInteractionResponder *
     if (self == [CRToast class]) {
         
         kCRFontDefault = [UIFont systemFontOfSize:12];
+        kCRFontAttributesDefault = @{};
         kCRTextColorDefault = [UIColor whiteColor];
         kCRTextShadowOffsetDefault = CGSizeZero;
         kCRSubtitleFontDefault = [UIFont systemFontOfSize:12];
@@ -444,14 +456,16 @@ NSArray * CRToastGenericRecognizersMake(id target, CRToastInteractionResponder *
         kCRInteractionResponders = @[];
         
         kCRToastKeyClassMap = @{kCRToastNotificationTypeKey                 : NSStringFromClass([@(kCRNotificationTypeDefault) class]),
-                                kCRToastNotificationPreferredHeightKey         : NSStringFromClass([@(kCRNotificationPreferredHeightDefault) class]),
+                                kCRToastNotificationPreferredHeightKey      : NSStringFromClass([@(kCRNotificationPreferredHeightDefault) class]),
                                 kCRToastNotificationPresentationTypeKey     : NSStringFromClass([@(kCRNotificationPresentationTypeDefault) class]),
                                 kCRToastUnderStatusBarKey                   : NSStringFromClass([@(kCRDisplayUnderStatusBarDefault) class]),
+                                kCRToastBelowNavBarKey                      : NSStringFromClass([@(kCRDisplayBelowNavBarDefault) class]),
                                 kCRToastAnimationInTypeKey                  : NSStringFromClass([@(kCRAnimationTypeDefaultIn) class]),
                                 kCRToastAnimationOutTypeKey                 : NSStringFromClass([@(kCRAnimationTypeDefaultOut) class]),
                                 kCRToastAnimationInDirectionKey             : NSStringFromClass([@(kCRInAnimationDirectionDefault) class]),
                                 kCRToastAnimationOutDirectionKey            : NSStringFromClass([@(kCROutAnimationDirectionDefault) class]),
                                 kCRToastAnimationInTimeIntervalKey          : NSStringFromClass([@(kCRAnimateInTimeIntervalDefault) class]),
+                                kCRToastImageAlignmentKey                   : NSStringFromClass([@(kCRToastImageAlignmentDefault) class]),
                                 kCRToastTimeIntervalKey                     : NSStringFromClass([@(kCRTimeIntervalDefault) class]),
                                 kCRToastAnimationOutTimeIntervalKey         : NSStringFromClass([@(kCRAnimateOutTimeIntervalDefault) class]),
                                 kCRToastAnimationSpringDampingKey           : NSStringFromClass([@(kCRSpringDampingDefault) class]),
@@ -459,6 +473,7 @@ NSArray * CRToastGenericRecognizersMake(id target, CRToastInteractionResponder *
                                 kCRToastAnimationGravityMagnitudeKey        : NSStringFromClass([@(kCRGravityMagnitudeDefault) class]),
                                 kCRToastTextKey                             : NSStringFromClass([NSString class]),
                                 kCRToastFontKey                             : NSStringFromClass([UIFont class]),
+                                kCRToastFontAttributesKey                   : NSStringFromClass([NSDictionary class]),
                                 kCRToastTextColorKey                        : NSStringFromClass([UIColor class]),
                                 kCRToastTextAlignmentKey                    : NSStringFromClass([@(kCRTextAlignmentDefault) class]),
                                 kCRToastTextShadowColorKey                  : NSStringFromClass([UIColor class]),
@@ -473,7 +488,7 @@ NSArray * CRToastGenericRecognizersMake(id target, CRToastInteractionResponder *
                                 kCRToastSubtitleTextMaxNumberOfLinesKey     : NSStringFromClass([@(kCRSubtitleTextMaxNumberOfLinesDefault) class]),
                                 kCRToastStatusBarStyleKey                   : NSStringFromClass([@(kCRStatusBarStyleDefault) class]),
                                 kCRToastBackgroundColorKey                  : NSStringFromClass([UIColor class]),
-                                kCRToastImageKey                            : NSStringFromClass([UIImage class]),
+                                kCRToastImageViewKey                        : NSStringFromClass([UIImageView class]),
                                 kCRToastInteractionRespondersKey            : NSStringFromClass([NSArray class]),
                                 kCRToastAutorotateKey                       : NSStringFromClass([@(kCRAutoRotateDefault) class])};
     }
@@ -496,11 +511,14 @@ NSArray * CRToastGenericRecognizersMake(id target, CRToastInteractionResponder *
     if (defaultOptions[kCRToastNotificationPresentationTypeKey])    kCRNotificationPresentationTypeDefault  = [defaultOptions[kCRToastNotificationPresentationTypeKey] integerValue];
     
     if (defaultOptions[kCRToastUnderStatusBarKey])                  kCRDisplayUnderStatusBarDefault         = [defaultOptions[kCRToastUnderStatusBarKey] boolValue];
+    if (defaultOptions[kCRToastBelowNavBarKey])                     kCRDisplayBelowNavBarDefault            = [defaultOptions[kCRToastBelowNavBarKey] boolValue];
     
     if (defaultOptions[kCRToastAnimationInTypeKey])                 kCRAnimationTypeDefaultIn               = [defaultOptions[kCRToastAnimationInTypeKey] integerValue];
     if (defaultOptions[kCRToastAnimationOutTypeKey])                kCRAnimationTypeDefaultOut              = [defaultOptions[kCRToastAnimationOutTypeKey] integerValue];
     if (defaultOptions[kCRToastAnimationInDirectionKey])            kCRInAnimationDirectionDefault          = [defaultOptions[kCRToastAnimationInDirectionKey] integerValue];
     if (defaultOptions[kCRToastAnimationOutDirectionKey])           kCROutAnimationDirectionDefault         = [defaultOptions[kCRToastAnimationOutDirectionKey] integerValue];
+    
+    if (defaultOptions[kCRToastImageAlignmentKey])                  kCRToastImageAlignmentDefault           = [defaultOptions[kCRToastImageAlignmentKey] integerValue];
     
     if (defaultOptions[kCRToastAnimationInTimeIntervalKey])         kCRAnimateInTimeIntervalDefault         = [defaultOptions[kCRToastAnimationInTimeIntervalKey] doubleValue];
     if (defaultOptions[kCRToastTimeIntervalKey])                    kCRTimeIntervalDefault                  = [defaultOptions[kCRToastTimeIntervalKey] doubleValue];
@@ -512,6 +530,7 @@ NSArray * CRToastGenericRecognizersMake(id target, CRToastInteractionResponder *
     
     if (defaultOptions[kCRToastTextKey])                            kCRTextDefault                          = defaultOptions[kCRToastTextKey];
     if (defaultOptions[kCRToastFontKey])                            kCRFontDefault                          = defaultOptions[kCRToastFontKey];
+    if (defaultOptions[kCRToastFontAttributesKey])                  kCRFontAttributesDefault                = defaultOptions[kCRToastFontAttributesKey];
     if (defaultOptions[kCRToastTextColorKey])                       kCRTextColorDefault                     = defaultOptions[kCRToastTextColorKey];
     if (defaultOptions[kCRToastTextAlignmentKey])                   kCRTextAlignmentDefault                 = [defaultOptions[kCRToastTextAlignmentKey] integerValue];
     if (defaultOptions[kCRToastTextShadowColorKey])                 kCRTextShadowColorDefault               = defaultOptions[kCRToastTextShadowColorKey];
@@ -529,7 +548,7 @@ NSArray * CRToastGenericRecognizersMake(id target, CRToastInteractionResponder *
     if (defaultOptions[kCRToastSubtitleTextMaxNumberOfLinesKey])    kCRSubtitleTextMaxNumberOfLinesDefault  = [defaultOptions[kCRToastSubtitleTextMaxNumberOfLinesKey] integerValue];
     
     if (defaultOptions[kCRToastBackgroundColorKey])                 kCRBackgroundColorDefault               = defaultOptions[kCRToastBackgroundColorKey];
-    if (defaultOptions[kCRToastImageKey])                           kCRImageDefault                         = defaultOptions[kCRToastImageKey];
+    if (defaultOptions[kCRToastImageViewKey])                       kCRImageViewDefault                     = defaultOptions[kCRToastImageViewKey];
     
     if (defaultOptions[kCRToastInteractionRespondersKey])           kCRInteractionResponders               = defaultOptions[kCRToastInteractionRespondersKey];
     if (defaultOptions[kCRToastAutorotateKey])                      kCRAutoRotateDefault                   = [defaultOptions[kCRToastAutorotateKey] boolValue];
@@ -635,6 +654,12 @@ NSArray * CRToastGenericRecognizersMake(id target, CRToastInteractionResponder *
     kCRDisplayUnderStatusBarDefault;
 }
 
+- (BOOL)displayBelowNavBar {
+    return _options[kCRToastBelowNavBarKey] ?
+    [self.options[kCRToastBelowNavBarKey] boolValue] :
+    kCRDisplayBelowNavBarDefault;
+}
+
 - (CRToastAnimationType)inAnimationType {
     return _options[kCRToastAnimationInTypeKey] ?
     [_options[kCRToastAnimationInTypeKey] integerValue] :
@@ -645,6 +670,13 @@ NSArray * CRToastGenericRecognizersMake(id target, CRToastInteractionResponder *
     return _options[kCRToastAnimationOutTypeKey] ?
     [_options[kCRToastAnimationOutTypeKey] integerValue] :
     kCRAnimationTypeDefaultOut;
+}
+
+- (CRToastImageAlignment)imageAlignment {
+    CRToastImageAlignment alignment = _options[kCRToastImageAlignmentKey] ?
+    [_options[kCRToastImageAlignmentKey] integerValue] :
+    kCRToastImageAlignmentDefault;
+    return alignment;
 }
 
 - (CRToastAnimationDirection)inAnimationDirection {
@@ -703,6 +735,10 @@ NSArray * CRToastGenericRecognizersMake(id target, CRToastInteractionResponder *
     return _options[kCRToastFontKey] ?: kCRFontDefault;
 }
 
+- (NSDictionary*)fontAttributes {
+    return _options[kCRToastFontAttributesKey] ?: kCRFontAttributesDefault;
+}
+
 - (UIColor*)textColor {
     return _options[kCRToastTextColorKey] ?: kCRTextColorDefault;
 }
@@ -751,8 +787,8 @@ NSArray * CRToastGenericRecognizersMake(id target, CRToastInteractionResponder *
     return _options[kCRToastBackgroundColorKey] ?: kCRBackgroundColorDefault;
 }
 
-- (UIImage*)image {
-    return _options[kCRToastImageKey] ?: kCRImageDefault;
+- (UIImageView*)imageView {
+    return _options[kCRToastImageViewKey] ?: kCRImageViewDefault;
 }
 
 - (NSInteger)maxNumberOfLines {
@@ -975,8 +1011,7 @@ static CGFloat kCRCollisionTweak = 0.5;
 @property (nonatomic, strong) UILabel *subtitleLabel;
 @end
 
-static CGFloat const kCRStatusBarViewNoImageLeftContentInset = 10;
-static CGFloat const kCRStatusBarViewNoImageRightContentInset = 10;
+static CGFloat const kCRStatusBarViewNoImageContentInset = 10;
 
 // UIApplication's statusBarFrame will return a height for the status bar that includes
 // a 5 pixel vertical padding. This frame height is inappropriate to use when centering content
@@ -1019,49 +1054,76 @@ static CGFloat const CRStatusBarViewUnderStatusBarYOffsetAdjustment = -5;
     CGRect contentFrame = self.bounds;
     CGSize imageSize = self.imageView.image.size;
     
-    CGFloat statusBarYOffset = self.toast.displayUnderStatusBar ? (CRGetStatusBarHeight()+CRStatusBarViewUnderStatusBarYOffsetAdjustment) : 0;
+    CGFloat statusBarYOffset = self.toast.displayUnderStatusBar ? (CRGetStatusBarHeight() + CRStatusBarViewUnderStatusBarYOffsetAdjustment) : 0;
     contentFrame.size.height = CGRectGetHeight(contentFrame) - statusBarYOffset;
     
-    self.imageView.frame = CGRectMake(0,
-                                      statusBarYOffset,
-                                      imageSize.width == 0 ?
-                                      0 :
-                                      CGRectGetHeight(contentFrame),
-                                      imageSize.height == 0 ?
-                                      0 :
-                                      CGRectGetHeight(contentFrame));
-    CGFloat x = imageSize.width == 0 ? kCRStatusBarViewNoImageLeftContentInset : CGRectGetMaxX(_imageView.frame);
-    CGFloat width = CGRectGetWidth(contentFrame)-x-kCRStatusBarViewNoImageRightContentInset;
+    CRToastImageAlignment alignment = self.toast.imageAlignment;
+
+    CGFloat labelX;
+    CGFloat labelWidth;
+
+    if (imageSize.width == 0) {
+        labelX = kCRStatusBarViewNoImageContentInset;
+        labelWidth = CGRectGetWidth(contentFrame) - labelX - kCRStatusBarViewNoImageContentInset;
+    } else {
+        labelX = alignment == CRToastImageLeft ? imageSize.width : kCRStatusBarViewNoImageContentInset;
+        labelWidth = CGRectGetWidth(contentFrame) - labelX - imageSize.width - kCRStatusBarViewNoImageContentInset;
+    }
+    
+    CGFloat imageX = 0;
+
+    if (alignment == CRToastImageCenter) {
+        imageX = CGRectGetWidth(contentFrame)/2 - CGRectGetWidth(self.imageView.frame)/2;
+    } else if (alignment == CRToastImageRight) {
+        imageX = CGRectGetWidth(contentFrame) - CGRectGetWidth(self.imageView.frame) - kCRStatusBarViewNoImageContentInset;
+    }
+    
+    CGRect newImageFrame = self.imageView.frame;
+    newImageFrame.origin.x = imageX;
+    newImageFrame.origin.y = CGRectGetHeight(contentFrame)/2 - CGRectGetHeight(self.imageView.frame)/2;
+    self.imageView.frame = newImageFrame;
+
+    [self addSubview:self.imageView];
+    
+    [self.imageView sizeToFit];
+    if (self.imageView.animationImages.count > 0)
+    {
+        [self.imageView startAnimating];
+    }
     
     if (self.toast.subtitleText == nil) {
-        self.label.frame = CGRectMake(x,
-                                      statusBarYOffset,
-                                      width,
-                                      CGRectGetHeight(contentFrame));
+        self.label.frame = CGRectMake(labelX, statusBarYOffset, labelWidth, CGRectGetHeight(contentFrame));
     } else {
-        CGFloat height = MIN([self.toast.text boundingRectWithSize:CGSizeMake(width, MAXFLOAT)
+        NSMutableDictionary *fontAttributes = [self.toast.fontAttributes mutableCopy];
+        [fontAttributes setObject:self.toast.font forKey:NSFontAttributeName];
+
+        CGFloat height = MIN(([self.toast.text boundingRectWithSize:CGSizeMake(labelWidth, MAXFLOAT)
                                                            options:NSStringDrawingUsesLineFragmentOrigin
-                                                        attributes:@{NSFontAttributeName : self.toast.font}
-                                                           context:nil].size.height,
+                                                        attributes:fontAttributes
+                                                           context:nil].size.height),
                              CGRectGetHeight(contentFrame));
-        CGFloat subtitleHeight = [self.toast.subtitleText boundingRectWithSize:CGSizeMake(width, MAXFLOAT)
+        CGFloat subtitleHeight = [self.toast.subtitleText boundingRectWithSize:CGSizeMake(labelWidth, MAXFLOAT)
                                                                        options:NSStringDrawingUsesLineFragmentOrigin
-                                                                    attributes:@{NSFontAttributeName : self.toast.subtitleFont }
+                                                                    attributes:@{
+                                                                                 NSFontAttributeName : self.toast.subtitleFont,
+                                                                                 }
                                                                        context:nil].size.height;
+        
         if ((CGRectGetHeight(contentFrame) - (height + subtitleHeight)) < 5) {
             subtitleHeight = (CGRectGetHeight(contentFrame) - (height))-10;
         }
+        
         CGFloat offset = (CGRectGetHeight(contentFrame) - (height + subtitleHeight))/2;
         
-        self.label.frame = CGRectMake(x,
-                                      offset+statusBarYOffset,
-                                      CGRectGetWidth(contentFrame)-x-kCRStatusBarViewNoImageRightContentInset,
+        self.label.frame = CGRectMake(labelX,
+                                      offset + statusBarYOffset,
+                                      CGRectGetWidth(contentFrame) - labelX - kCRStatusBarViewNoImageContentInset,
                                       height);
         
         
-        self.subtitleLabel.frame = CGRectMake(x,
-                                              height+offset+statusBarYOffset,
-                                              CGRectGetWidth(contentFrame)-x-kCRStatusBarViewNoImageRightContentInset,
+        self.subtitleLabel.frame = CGRectMake(labelX,
+                                              height + offset + statusBarYOffset,
+                                              CGRectGetWidth(contentFrame) - labelX - kCRStatusBarViewNoImageContentInset,
                                               subtitleHeight);
     }
 }
@@ -1070,11 +1132,12 @@ static CGFloat const CRStatusBarViewUnderStatusBarYOffsetAdjustment = -5;
 
 - (void)setToast:(CRToast *)toast {
     _toast = toast;
-    _label.text = toast.text;
+    _label.attributedText = [[NSAttributedString alloc] initWithString:toast.text attributes:self.toast.fontAttributes];
     _label.font = toast.font;
     _label.textColor = toast.textColor;
     _label.textAlignment = toast.textAlignment;
     _label.numberOfLines = toast.textMaxNumberOfLines;
+    
     if (toast.subtitleText != nil) {
         _subtitleLabel.text = toast.subtitleText;
         _subtitleLabel.font = toast.subtitleFont;
@@ -1082,7 +1145,7 @@ static CGFloat const CRStatusBarViewUnderStatusBarYOffsetAdjustment = -5;
         _subtitleLabel.textAlignment = toast.subtitleTextAlignment;
         _subtitleLabel.numberOfLines = toast.subtitleTextMaxNumberOfLines;
     }
-    _imageView.image = toast.image;
+    _imageView = toast.imageView;
     self.backgroundColor = toast.backgroundColor;
 }
 
@@ -1366,7 +1429,13 @@ CRToastAnimationStepBlock CRToastOutwardAnimationsSetupBlock(CRToastManager *wea
     _notificationWindow.hidden = NO;
     CGSize notificationSize = CRNotificationViewSize(notification.notificationType, notification.preferredHeight);
     
-    CGRect containerFrame = CGRectMake(0, 0, notificationSize.width, notificationSize.height);
+    
+    CGFloat y = 0.0f;
+    if (notification.displayBelowNavBar) {
+        y = CRGetNavigationBarHeight() + CRGetStatusBarHeight() - 1;
+    }
+    
+    CGRect containerFrame = CGRectMake(0, y, notificationSize.width, notificationSize.height);
     
     if ([UIApplication sharedApplication].statusBarOrientation == UIInterfaceOrientationLandscapeLeft) {
         containerFrame = CGRectMake(0, 0, notificationSize.height, notificationSize.width);
